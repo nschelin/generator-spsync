@@ -1,0 +1,15 @@
+{
+  "name": "generator-spsync",
+  "version": "1.0.0",
+  "description": "Yeoman generator to generate project files to sync with SharePoint using App Model and Gulp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "author": "N. Schelin",
+  "license": "ISC",
+  "dependencies": {
+    "yeoman-generator": "^0.24.1"
+  }
+}
