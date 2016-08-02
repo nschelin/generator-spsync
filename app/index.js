@@ -11,6 +11,33 @@ module.exports = generators.Base.extend({
 	},
 	prompting: function() {
 
+	return this.prompt([
+		{
+			type: 'input',
+			name: 'clientId',
+			message: 'Enter the Client Id',
+			default: ""
+		},
+		{
+			type: 'input',
+			name: 'clientSecret',
+			message: 'Enter the Client Secret',
+			default: ""
+		},
+		{
+			type: 'input',
+			name: 'realm',
+			message: 'Enter the Realm',
+			default: "",
+		},
+		{
+			type: 'input',
+			name: 'siteUrl',
+			message: 'Enter the site\'s URL',
+			default: ""
+		}
+		]).then(function(answers) {
+		});
 	},
 	configuring: function() {
 
