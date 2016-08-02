@@ -1,6 +1,9 @@
 'use strict';
 var generators = require('yeoman-generator');
 var fs = require('fs');
+var validator = require('validator');
+var yosay = require('yosay');
+var chalk = require('chalk');
 
 module.exports = generators.Base.extend({
 	constructor: function(){
@@ -10,33 +13,45 @@ module.exports = generators.Base.extend({
 
 	},
 	prompting: function() {
-
-	return this.prompt([
+		var yeo = this;
+		yeo.log(yosay(chalk.red('SPSync:') + '\nSync Files to ' + chalk.blue('SharePoint') + ' using Gulp and the ' + chalk.blue('SharePoint') + ' App Model'));
+		var done = this.async();
+		yeo.prompt([
 		{
 			type: 'input',
 			name: 'clientId',
 			message: 'Enter the Client Id',
-			default: ""
 		},
 		{
 			type: 'input',
 			name: 'clientSecret',
 			message: 'Enter the Client Secret',
-			default: ""
 		},
 		{
 			type: 'input',
 			name: 'realm',
 			message: 'Enter the Realm',
-			default: "",
 		},
 		{
 			type: 'input',
 			name: 'siteUrl',
 			message: 'Enter the site\'s URL',
-			default: ""
 		}
 		]).then(function(answers) {
+
+			if(!validator.isUUID(answers.clientId))	{
+				yeo.env.error('Client Id is not a valid GUID');				
+			}
+
+			if(!validator.isUUID(answers.clientSecret))	{
+				yeo.env.error('Client Secret is not a valid GUID');				
+			}
+
+			if(!validator.isURL(answers.siteUrl))	{
+				yeo.env.error('Site Url is not a valid Url');				
+			}			
+			// finished prompting
+			done();
 		});
 	},
 	configuring: function() {
