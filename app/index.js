@@ -29,13 +29,13 @@ module.exports = generators.Base.extend({
 		},
 		{
 			type: 'input',
-			name: 'realm',
-			message: 'Enter the Realm',
+			name: 'siteUrl',
+			message: 'Enter the site\'s URL',
 		},
 		{
 			type: 'input',
-			name: 'siteUrl',
-			message: 'Enter the site\'s URL',
+			name: 'realm',
+			message: 'Enter the Realm (optional)',
 		}
 		]).then(function(answers) {
 
@@ -50,6 +50,12 @@ module.exports = generators.Base.extend({
 			if(!validator.isURL(answers.siteUrl))	{
 				yeo.env.error('Site Url is not a valid Url');				
 			}			
+
+			yeo.clientId = answers.clientId;
+			yeo.clientSecret = answers.clientSecret;
+			yeo.siteUrl = answers.siteUrl;
+			yeo.realm = answers.realm;
+
 			// finished prompting
 			done();
 		});
@@ -62,17 +68,46 @@ module.exports = generators.Base.extend({
 	},
 	writing: {
 		folders: function() {
-			var styleLibrary = this.destinationRoot() + "/Style Library"
+			var src = this.destinationRoot() + "/src";
+			
+			// master page
+			var _catalogs = src + "/_catalogs";
+			var masterpage = _catalogs + "/masterpage";
+
+			// style library
+			var styleLibrary = src + "/Style Library"
+			var html = styleLibrary + "/html";
 			var css = styleLibrary + "/css";
 			var js = styleLibrary + "/js";
 			var img = styleLibrary + "/img";
+
+			// create folders
+			fs.mkdirSync(src);
+
+			// master page
+			fs.mkdirSync(_catalogs);
+			fs.mkdirSync(masterpage);
+
+			// style library
 			fs.mkdirSync(styleLibrary);
+			fs.mkdirSync(html);
 			fs.mkdirSync(css);
 			fs.mkdirSync(js);
 			fs.mkdirSync(img);
 		},
 		gulpfile: function() {
+			this.fs.copyTpl(
+				this.templatePath('_gulpfile.js'),
+				this.destinationPath('gulpfile.js'),
+				{
+					clientId: this.clientId,
+					clientSecret: this.clientSecret,
+					siteUrl: this.siteUrl,
+					realm: this.realm
+				}
+			);
 
+			this.copy('gitignore', '.gitignore');
 		},
 		packageJSON: function() {
 
