@@ -48,9 +48,10 @@ module.exports = generators.Base.extend({
 		});
 	},
 	writing: function() {
+		var projectName = this.config.get('projectName');
 		this.fs.copyTpl(
 			this.templatePath('_index.html'),
-			this.destinationPath('src/Style Library/html/' + this.name + '.html'), 
+			this.destinationPath('src/Style Library/' + projectName + '/html/' + this.name + '.html'), 
 			{
 				title: this.name
 			});

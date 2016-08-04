@@ -8,13 +8,16 @@ var chalk = require('chalk');
 module.exports = generators.Base.extend({
 	constructor: function(){
 		generators.Base.apply(this, arguments);
+		this.argument('name', { type: String, required: true });
+
 	},
 	initializing: function(){
 
 	},
 	prompting: function() {
 		var yeo = this;
-		yeo.log(yosay(chalk.red('SPSync:') + '\nSync Files to ' + chalk.blue('SharePoint') + ' using Gulp and the ' + chalk.blue('SharePoint') + ' App Model'));
+		yeo.log(yosay(chalk.red('SPSync:') + '\nSync Files to ' + chalk.cyan('SharePoint') + ' using Gulp and the ' + chalk.cyan('SharePoint') + ' App Model'));
+		yeo.log('Follow instructions at the following URL to be able to provide the following parameters:' + chalk.cyan('https://github.com/wictorwilen/gulp-spsync'));
 		var done = this.async();
 		yeo.prompt([
 		{
@@ -43,8 +46,12 @@ module.exports = generators.Base.extend({
 				yeo.env.error('Client Id is not a valid GUID');				
 			}
 
-			if(!validator.isUUID(answers.clientSecret))	{
+			if(!validator.isBase64(answers.clientSecret))	{
 				yeo.env.error('Client Secret is not a valid GUID');				
+			}
+
+			if(!validator.isNull(answers.realm) && !validator.isUUID(answers.realm)){
+					yeo.env.error('Realm is not a valid GUID');		
 			}
 
 			if(!validator.isURL(answers.siteUrl))	{
@@ -68,6 +75,10 @@ module.exports = generators.Base.extend({
 	},
 	writing: {
 		folders: function() {
+			var projectName = this.name.replace(/\s+/g, '-').toLowerCase();
+			this.config.set('projectName', projectName);
+			this.config.save();
+
 			var src = this.destinationRoot() + "/src";
 			
 			// master page
@@ -75,11 +86,12 @@ module.exports = generators.Base.extend({
 			var masterpage = _catalogs + "/masterpage";
 
 			// style library
-			var styleLibrary = src + "/Style Library"
-			var html = styleLibrary + "/html";
-			var css = styleLibrary + "/css";
-			var js = styleLibrary + "/js";
-			var img = styleLibrary + "/img";
+			var styleLibrary = src + "/Style Library/";
+			var project = styleLibrary + projectName;
+			var html = project + "/html";
+			var css = project + "/css";
+			var js = project + "/js";
+			var img = project + "/img";
 
 			// create folders
 			fs.mkdirSync(src);
@@ -90,6 +102,7 @@ module.exports = generators.Base.extend({
 
 			// style library
 			fs.mkdirSync(styleLibrary);
+			fs.mkdirSync(project);
 			fs.mkdirSync(html);
 			fs.mkdirSync(css);
 			fs.mkdirSync(js);
@@ -110,7 +123,13 @@ module.exports = generators.Base.extend({
 			this.copy('gitignore', '.gitignore');
 		},
 		packageJSON: function() {
-
+			this.fs.copyTpl(
+				this.templatePath('_package.json'),
+				this.destinationPath('package.json'),
+				{
+					projectName: this.config.get('projectName')
+				}
+			);			
 		},
 		git: function() {
 
@@ -123,7 +142,7 @@ module.exports = generators.Base.extend({
 
 	},
 	install: function() {
-
+		this.npmInstall();
 	},
 	end: function() {
 

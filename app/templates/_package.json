@@ -1,0 +1,18 @@
+{
+  "name": "<%= projectName %>",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "gulp-spsync": "github:wictorwilen/gulp-spsync",
+    "lodash": "^4.14.1",
+    "validator": "^5.5.0"
+  }
+}

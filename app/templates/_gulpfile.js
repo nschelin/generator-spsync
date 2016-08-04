@@ -1,13 +1,13 @@
 var gulp = require('gulp')
 var sp = require('gulp-spsync')
-gulp.task('default', function() {
+gulp.task('upload', function() {
 return gulp.src('src/**/*.*').
     pipe(sp({
         "client_id":"<%= clientId %>",
         "client_secret":"<%= clientSecret %>",
         "realm" : "",
         "site" : "<%= siteUrl %>",
-        "verbose": "true"
+        "verbose": true
     })).        
     pipe(gulp.dest('build'))
 })
