@@ -1,6 +1,7 @@
 'use strict';
 var generators = require('yeoman-generator');
 var _ = require('lodash');
+var fs = require('fs');
 
 module.exports = generators.Base.extend({
 	constructor: function() {
@@ -58,33 +59,48 @@ module.exports = generators.Base.extend({
 				});
 		},
 		bower: function() {
-			var bowerJson = {
-				name: this.config.get('projectName'),
-				license: 'MIT',
-				dependencies: { }
-			};
+			var yeo = this;
+			var bowerJson = null;
+			var bowerJsonPath = this.destinationPath() + "/bower.json";
+			fs.stat(bowerJsonPath, function(err, stats) {
+				if(err) {
+					console.log('error: ' + err);
+				}
 
-			if(this.jQuery) {
-				bowerJson.dependencies['jquery'] = '~3.1.0';
-			}
-			
-			if(this.bootstrap) {
-				bowerJson.dependencies['bootstrap'] = '~3.3.7';
-			}
-			
-			if(this.lodash) {
-				bowerJson.dependencies['lodash'] = '~4.14.1';
-			}
+				if(stats && stats.isFile()) {
+					bowerJson = JSON.parse(fs.readFileSync(bowerJsonPath, 'utf8').toString());
+					console.log('exists! ' + JSON.stringify(bowerJson));
+				} else {
+					bowerJson = {
+						name: yeo.config.get('projectName'),
+						license: 'MIT',
+						dependencies: { }
+					};		
+				}
 
-			if(this.momentjs) {
-				bowerJson.dependencies['moment'] = '~2.14.1';
-			}
+				if(yeo.jQuery) {
+					bowerJson.dependencies['jquery'] = '~3.1.0';
+				}
+				
+				if(yeo.bootstrap) {
+					bowerJson.dependencies['bootstrap'] = '~3.3.7';
+				}
+				
+				if(yeo.lodash) {
+					bowerJson.dependencies['lodash'] = '~4.14.1';
+				}
 
-			if(this.validator) {
-				bowerJson.dependencies['validator-js'] = '~5.5.0';
-			}
-			
-			this.fs.writeJSON('bower.json', bowerJson);
+				if(yeo.momentjs) {
+					bowerJson.dependencies['moment'] = '~2.14.1';
+				}
+
+				if(yeo.validator) {
+					bowerJson.dependencies['validator-js'] = '~5.5.0';
+				}
+
+				yeo.fs.writeJSON('bower.json', bowerJson);
+
+			});
 		}
 	}
 });
