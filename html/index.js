@@ -47,13 +47,44 @@ module.exports = generators.Base.extend({
 			yeo.validator = _.includes(answers.jsLibs, 'validator');
 		});
 	},
-	writing: function() {
-		var projectName = this.config.get('projectName');
-		this.fs.copyTpl(
-			this.templatePath('_index.html'),
-			this.destinationPath('src/Style Library/' + projectName + '/html/' + this.name + '.html'), 
-			{
-				title: this.name
-			});
+	writing: {
+		files: function() {
+			var projectName = this.config.get('projectName');
+			this.fs.copyTpl(
+				this.templatePath('_index.html'),
+				this.destinationPath('src/Style Library/' + projectName + '/html/' + this.name + '.html'), 
+				{
+					title: this.name
+				});
+		},
+		bower: function() {
+			var bowerJson = {
+				name: this.config.get('projectName'),
+				license: 'MIT',
+				dependencies: { }
+			};
+
+			if(this.jQuery) {
+				bowerJson.dependencies['jquery'] = '~3.1.0';
+			}
+			
+			if(this.bootstrap) {
+				bowerJson.dependencies['bootstrap'] = '~3.3.7';
+			}
+			
+			if(this.lodash) {
+				bowerJson.dependencies['lodash'] = '~4.14.1';
+			}
+
+			if(this.momentjs) {
+				bowerJson.dependencies['moment'] = '~2.14.1';
+			}
+
+			if(this.validator) {
+				bowerJson.dependencies['validator-js'] = '~5.5.0';
+			}
+			
+			this.fs.writeJSON('bower.json', bowerJson);
+		}
 	}
 });

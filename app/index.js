@@ -135,7 +135,6 @@ module.exports = generators.Base.extend({
 
 		},
 		bower: function() {
-
 		}
 	},
 	conflicts: function() {
