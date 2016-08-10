@@ -4,6 +4,8 @@ var fs = require('fs');
 var validator = require('validator');
 var yosay = require('yosay');
 var chalk = require('chalk');
+var _ = require('lodash');
+
 
 module.exports = generators.Base.extend({
 	constructor: function(){
@@ -18,6 +20,7 @@ module.exports = generators.Base.extend({
 		var yeo = this;
 		yeo.log(yosay(chalk.red('SPSync:') + '\nSync Files to ' + chalk.cyan('SharePoint') + ' using Gulp and the ' + chalk.cyan('SharePoint') + ' App Model'));
 		yeo.log('Follow instructions at the following URL to be able to provide the following parameters:' + chalk.cyan('https://github.com/wictorwilen/gulp-spsync'));
+		
 		var done = this.async();
 		yeo.prompt([
 		{
@@ -39,6 +42,36 @@ module.exports = generators.Base.extend({
 			type: 'input',
 			name: 'realm',
 			message: 'Enter the Realm (optional)',
+		},
+		{
+			type: 'checkbox',
+			name: 'jsLibs',
+			message: 'Include the following libraries?',
+			choices: [{
+				name: 'jQuery',
+				value: 'jQUery',
+				checked: true
+			},
+			{
+				name: 'bootstrap 3',
+				value: 'bootstrap 3',
+				checked: true
+			},
+			{
+				name: 'lodash',
+				value: 'lodash',
+				checked: true
+			}, 
+			{
+				name: 'moment.js',
+				value: 'moment.js',
+				checked: false
+			},
+			{
+				name: 'validator',
+				value: 'validator',
+				checked: false
+			}]
 		}
 		]).then(function(answers) {
 
@@ -62,6 +95,12 @@ module.exports = generators.Base.extend({
 			yeo.clientSecret = answers.clientSecret;
 			yeo.siteUrl = answers.siteUrl;
 			yeo.realm = answers.realm;
+
+			yeo.jQuery = _.includes(answers.jsLibs, 'jQuery');
+			yeo.bootstrap = _.includes(answers.jsLibs, 'bootstrap 3');
+			yeo.lodash = _.includes(answers.jsLibs, 'lodash');
+			yeo.momentjs = _.includes(answers.jsLibs, 'moment.js');
+			yeo.validator = _.includes(answers.jsLibs, 'validator');
 
 			// finished prompting
 			done();
@@ -135,13 +174,42 @@ module.exports = generators.Base.extend({
 
 		},
 		bower: function() {
+			var yeo = this;
+			var bowerJson = {
+				name: yeo.config.get('projectName'),
+				license: 'MIT',
+				dependencies: { }
+			};	
+
+			if(yeo.jQuery) {
+				bowerJson.dependencies['jquery'] = '~3.1.0';
+			}
+			
+			if(yeo.bootstrap) {
+				bowerJson.dependencies['bootstrap'] = '~3.3.7';
+			}
+			
+			if(yeo.lodash) {
+				bowerJson.dependencies['lodash'] = '~4.14.1';
+			}
+
+			if(yeo.momentjs) {
+				bowerJson.dependencies['moment'] = '~2.14.1';
+			}
+
+			if(yeo.validator) {
+				bowerJson.dependencies['validator-js'] = '~5.5.0';
+			}
+
+			this.fs.writeJSON('bower.json', bowerJson);
+			this.copy('bowerrc', '.bowerrc');
 		}
 	},
 	conflicts: function() {
 
 	},
 	install: function() {
-		this.npmInstall();
+		this.installDependencies();
 	},
 	end: function() {
 
